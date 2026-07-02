@@ -29,6 +29,9 @@
                 </div>
                 <small class="text-muted mb-2 d-block">
                     Order #{{ order.id }} · {{ order.created_at|time:"H:i" }}
+                    <span class="badge bg-secondary ms-1" id="k-elapsed-{{ order.id }}">
+                    -- min
+                    </span>
                 </small>
                 <ul class="list-unstyled mb-3">
                     {% for item in order.items.all %}
@@ -165,6 +168,27 @@ function getCookie(name) {
 
 // Poll every 5 seconds
 setInterval(updateKitchen, 5000);
+// Kitchen elapsed time
+function updateKitchenElapsed() {
+    fetch('/api/kitchen/')
+        .then(r => r.json())
+        .then(data => {
+            data.orders.forEach(order => {
+                const el = document.getElementById(`k-elapsed-${order.id}`);
+                if (el && order.minutes_ago !== undefined) {
+                    const mins = order.minutes_ago;
+                    el.textContent = mins < 60
+                        ? `${mins} min`
+                        : `${Math.floor(mins/60)}h ${mins%60}m`;
+                    el.className = mins > 20
+                        ? 'badge bg-danger ms-1'
+                        : 'badge bg-secondary ms-1';
+                }
+            });
+        });
+}
+setInterval(updateKitchenElapsed, 10000);
+updateKitchenElapsed();
 </script>
 
 {% endblock %}

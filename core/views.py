@@ -130,7 +130,7 @@ def table_order(request, table_id):
 def mark_order_served(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order.status = 'paid'
-    order.served_at = timezone.now()
+    order.served_at = tz.now()
     order.save()
     order.table.is_occupied = False
     order.table.save()
@@ -380,26 +380,33 @@ def admin_permissions(request):
     return render(request, 'core/admin/permissions.html', {'perms': perms})
 #=============================================================================
 from django.http import JsonResponse
+from django.utils import timezone as tz
 
 def api_dashboard_status(request):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'unauthorized'}, status=401)
-    
+
+    now    = tz.now()
     tables = Table.objects.all().order_by('number')
     active = []
+
     for table in tables:
         order = Order.objects.filter(
             table=table,
             status__in=['pending', 'preparing', 'served']
         ).prefetch_related('items__menu_item').first()
         if order:
+            diff    = now - order.created_at
+            minutes = int(diff.total_seconds() // 60)
             active.append({
                 'table_number': table.number,
+                'table_id':     table.id,
                 'order_id':     order.id,
                 'status':       order.status,
                 'items_count':  order.items.count(),
                 'total':        str(order.total_price()),
                 'time':         order.created_at.strftime('%H:%M'),
+                'minutes_ago':  minutes,
             })
 
     ready = Order.objects.filter(status='served').select_related('table')
@@ -419,18 +426,23 @@ def api_kitchen_status(request):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'unauthorized'}, status=401)
 
+    now    = tz.now()
     orders = Order.objects.filter(
         status__in=['pending', 'preparing']
     ).select_related('table').prefetch_related('items__menu_item').order_by('created_at')
 
     data = []
     for order in orders:
+        diff    = now - order.created_at
+        minutes = int(diff.total_seconds() // 60)
         data.append({
-            'id':       order.id,
-            'table':    order.table.number,
-            'status':   order.status,
-            'time':     order.created_at.strftime('%H:%M'),
-            'items':    [
+            'id':          order.id,
+            'table':       order.table.number,
+            'table_id':    order.table.id,
+            'status':      order.status,
+            'time':        order.created_at.strftime('%H:%M'),
+            'minutes_ago': minutes,
+            'items': [
                 {
                     'name':     i.menu_item.name,
                     'quantity': i.quantity,
