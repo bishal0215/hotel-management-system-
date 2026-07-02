@@ -44,7 +44,7 @@
                 <div>{{ item.quantity }}× {{ item.menu_item.name }}</div>
             {% endfor %}
         </td>
-        <td class="fw-semibold">${{ order.total_price }}</td>
+        <td class="fw-semibold">Rs.{{ order.total_price }}</td>
         <td>
             {% if order.status == 'paid' %}
                 <span class="badge bg-success">Paid</span>

@@ -27,7 +27,7 @@
                     <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
                         <div>
                             <div class="fw-semibold">{{ item.name }}</div>
-                            <div class="text-primary small">${{ item.price }}</div>
+                            <div class="text-primary small">Rs.{{ item.price }}</div>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <input type="number" name="quantity_{{ item.id }}"
@@ -75,7 +75,7 @@
                 {% endif %}
             </div>
             <div class="d-flex align-items-center gap-2">
-                <span>${{ item.subtotal }}</span>
+                <span>Rs.{{ item.subtotal }}</span>
                 <a href="{% url 'remove_order_item' item.id %}"
                    class="btn btn-danger btn-sm py-0 px-2"
                    onclick="return confirm('Remove this item?')">✕</a>
@@ -85,7 +85,7 @@
 
     <div class="d-flex justify-content-between fw-bold mt-3 mb-3 fs-6">
         <span>Total</span>
-        <span>${{ order.total_price }}</span>
+        <span>Rs.{{ order.total_price }}</span>
     </div>
 
     <!-- Always show View Bill -->

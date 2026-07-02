@@ -111,13 +111,18 @@ def table_order(request, table_id):
             note     = request.POST.get(f'note_{item.id}', '')
             if quantity > 0:
                 order_item, created = OrderItem.objects.get_or_create(
-                    order=order, menu_item=item,
-                    defaults={'quantity': quantity, 'note': note}
-                )
-                if not created:
-                    order_item.quantity += quantity
-                    order_item.note = note
-                    order_item.save()
+                order=order, menu_item=item,
+                defaults={
+                    'quantity':   quantity,
+                    'note':       note,
+                    'unit_price': item.price,
+                }
+            )
+            if not created:
+                order_item.quantity  += quantity
+                order_item.note       = note
+                order_item.unit_price = item.price
+                order_item.save()
 
         return redirect('table_order', table_id=table.id)
 

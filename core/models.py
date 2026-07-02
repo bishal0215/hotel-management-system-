@@ -68,14 +68,21 @@ class Order(models.Model):
         return sum(item.subtotal() for item in self.items.all())
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
-    note = models.TextField(blank=True)  # e.g. "no onions"
+    order      = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    menu_item  = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
+    quantity   = models.PositiveIntegerField(default=1)
+    note       = models.TextField(blank=True)
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 
-    def __str__(self):
-        return f"{self.quantity}x {self.menu_item.name}"
+    def save(self, *args, **kwargs):
+        # Save price at time of ordering
+        if not self.unit_price:
+            self.unit_price = self.menu_item.price
+        super().save(*args, **kwargs)
 
+    def subtotal(self):
+        return self.quantity * self.unit_price
+    
     def subtotal(self):
         return self.quantity * self.menu_item.price
     
