@@ -75,16 +75,12 @@ class OrderItem(models.Model):
     unit_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 
     def save(self, *args, **kwargs):
-        # Save price at time of ordering
-        if not self.unit_price:
+        if self.unit_price == 0 or self.unit_price is None:
             self.unit_price = self.menu_item.price
         super().save(*args, **kwargs)
 
     def subtotal(self):
         return self.quantity * self.unit_price
-    
-    def subtotal(self):
-        return self.quantity * self.menu_item.price
     
 class RolePermission(models.Model):
     can_add_menu    = models.BooleanField(default=False)
