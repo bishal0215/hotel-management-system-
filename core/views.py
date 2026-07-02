@@ -440,7 +440,7 @@ def api_kitchen_status(request):
             'table':       order.table.number,
             'table_id':    order.table.id,
             'status':      order.status,
-            'time':        order.created_at.strftime('%H:%M'),
+            'time':        order.created_at.astimezone().strftime('%H:%M'),
             'minutes_ago': minutes,
             'items': [
                 {

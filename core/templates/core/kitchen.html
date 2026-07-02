@@ -107,6 +107,11 @@ function updateKitchen() {
                             </div>
                             <small class="text-muted mb-2 d-block">
                                 Order #${order.id} · ${order.time}
+                                <span class="badge ${order.minutes_ago > 20 ? 'bg-danger' : 'bg-secondary'} ms-1">
+                                    ${order.minutes_ago < 60 
+                                    ? order.minutes_ago + ' min' 
+                                    : Math.floor(order.minutes_ago/60) + 'h ' + (order.minutes_ago%60) + 'm'}
+                                </span>
                             </small>
                             <ul class="list-unstyled mb-3">
                                 ${order.items.map(item => `
