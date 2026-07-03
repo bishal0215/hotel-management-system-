@@ -37,9 +37,15 @@ class MenuItem(models.Model):
         ('drink', 'Drink'),
         ('dessert', 'Dessert'),
     ]
-    name = models.CharField(max_length=100)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    FOOD_TYPE_CHOICES = [
+        ('veg',     'Vegetarian'),
+        ('non_veg', 'Non-Vegetarian'),
+        ('na',      'N/A'),
+    ]
+    name         = models.CharField(max_length=100)
+    price        = models.DecimalField(max_digits=6, decimal_places=2)
+    category     = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    food_type    = models.CharField(max_length=10, choices=FOOD_TYPE_CHOICES, default='na')
     is_available = models.BooleanField(default=True)
 
     def __str__(self):

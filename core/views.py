@@ -94,40 +94,52 @@ def dashboard(request):
 
 @role_required('waiter', 'admin')
 def table_order(request, table_id):
-    table = get_object_or_404(Table, id=table_id)
+    table      = get_object_or_404(Table, id=table_id)
     menu_items = MenuItem.objects.filter(is_available=True).order_by('category')
-    order = Order.objects.filter(
+    order      = Order.objects.filter(
         table=table, status__in=['pending', 'preparing', 'served']
-    ).first()
+    ).prefetch_related('items__menu_item').first()
+    error      = None
 
     if request.method == 'POST':
-        if not order:
-            order = Order.objects.create(table=table, status='pending')
-            table.is_occupied = True
-            table.save()
+        has_items = any(
+            int(request.POST.get(f'quantity_{item.id}', 0)) > 0
+            for item in menu_items
+        )
 
-        for item in menu_items:
-            quantity = int(request.POST.get(f'quantity_{item.id}', 0))
-            note     = request.POST.get(f'note_{item.id}', '')
-            if quantity > 0:
-                order_item, created = OrderItem.objects.get_or_create(
-                order=order, menu_item=item,
-                defaults={
-                    'quantity':   quantity,
-                    'note':       note,
-                    'unit_price': item.price,
-                }
-            )
-            if not created:
-                order_item.quantity  += quantity
-                order_item.note       = note
-                order_item.unit_price = item.price
-                order_item.save()
+        if not has_items:
+            error = 'Please select at least one item before placing an order.'
+        else:
+            if not order:
+                order = Order.objects.create(table=table, status='pending')
+                table.is_occupied = True
+                table.save()
 
-        return redirect('table_order', table_id=table.id)
+            for item in menu_items:
+                quantity = int(request.POST.get(f'quantity_{item.id}', 0))
+                note     = request.POST.get(f'note_{item.id}', '')
+                if quantity > 0:
+                    order_item, created = OrderItem.objects.get_or_create(
+                        order=order, menu_item=item,
+                        defaults={
+                            'quantity':   quantity,
+                            'note':       note,
+                            'unit_price': item.price,
+                        }
+                    )
+                    if not created:
+                        order_item.quantity  += quantity
+                        order_item.note       = note
+                        order_item.unit_price = item.price
+                        order_item.save()
+
+            return redirect('table_order', table_id=table.id)
 
     return render(request, 'core/table_order.html', {
-        'table': table, 'menu_items': menu_items, 'order': order
+        'table':      table,
+        'menu_items': menu_items,
+        'order':      order,
+        'error':      error,
     })
 
 
@@ -287,10 +299,13 @@ def admin_menu(request):
 @permission_required('can_add_menu')
 def admin_create_menu_item(request):
     if request.method == 'POST':
+        category  = request.POST['category']
+        food_type = request.POST.get('food_type', 'na') if category == 'food' else 'na'
         MenuItem.objects.create(
             name         = request.POST['name'],
             price        = request.POST['price'],
-            category     = request.POST['category'],
+            category     = category,
+            food_type    = food_type,
             is_available = 'is_available' in request.POST,
         )
         messages.success(request, '✅ Menu item added.')
@@ -302,15 +317,16 @@ def admin_create_menu_item(request):
 def admin_edit_menu_item(request, item_id):
     item = get_object_or_404(MenuItem, id=item_id)
     if request.method == 'POST':
-        item.name         = request.POST['name']
-        item.price        = request.POST['price']
-        item.category     = request.POST['category']
+        category       = request.POST['category']
+        item.name      = request.POST['name']
+        item.price     = request.POST['price']
+        item.category  = category
+        item.food_type = request.POST.get('food_type', 'na') if category == 'food' else 'na'
         item.is_available = 'is_available' in request.POST
         item.save()
         messages.success(request, '✅ Menu item updated.')
         return redirect('admin_menu')
     return render(request, 'core/admin/edit_menu_item.html', {'item': item})
-
 
 @permission_required('can_delete_menu')
 def admin_delete_menu_item(request, item_id):

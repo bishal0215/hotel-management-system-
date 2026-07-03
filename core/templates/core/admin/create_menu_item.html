@@ -21,13 +21,33 @@
             <input type="number" name="price" step="0.01" class="form-control" required>
         </div>
         <div class="mb-3">
-            <label class="form-label fw-semibold">Category</label>
-            <select name="category" class="form-select">
-                <option value="food">Food</option>
-                <option value="drink">Drink</option>
-                <option value="dessert">Dessert</option>
-            </select>
-        </div>
+    <label class="form-label fw-semibold">Category</label>
+    <select name="category" class="form-select" id="category-select">
+        <option value="food">Food</option>
+        <option value="drink">Drink</option>
+        <option value="dessert">Dessert</option>
+    </select>
+</div>
+
+<div class="mb-3" id="food-type-section" style="display:none;">
+    <label class="form-label fw-semibold">Food Type</label>
+    <select name="food_type" class="form-select">
+        <option value="veg">🟢 Vegetarian</option>
+        <option value="non_veg">🔴 Non-Vegetarian</option>
+    </select>
+</div>
+
+<script>
+const catSelect = document.getElementById('category-select');
+const foodType  = document.getElementById('food-type-section');
+
+catSelect.addEventListener('change', function() {
+    foodType.style.display = this.value === 'food' ? 'block' : 'none';
+});
+
+// Show on load if food is selected
+if (catSelect.value === 'food') foodType.style.display = 'block';
+</script>
         <div class="mb-4 form-check">
             <input type="checkbox" name="is_available" class="form-check-input"
                    id="available" checked>

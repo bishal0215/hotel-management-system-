@@ -23,13 +23,31 @@
                    value="{{ item.price }}" required>
         </div>
         <div class="mb-3">
-            <label class="form-label fw-semibold">Category</label>
-            <select name="category" class="form-select">
-                <option value="food"    {% if item.category == 'food'    %}selected{% endif %}>Food</option>
-                <option value="drink"   {% if item.category == 'drink'   %}selected{% endif %}>Drink</option>
-                <option value="dessert" {% if item.category == 'dessert' %}selected{% endif %}>Dessert</option>
-            </select>
-        </div>
+    <label class="form-label fw-semibold">Category</label>
+    <select name="category" class="form-select" id="category-select">
+        <option value="food"    {% if item.category == 'food'    %}selected{% endif %}>Food</option>
+        <option value="drink"   {% if item.category == 'drink'   %}selected{% endif %}>Drink</option>
+        <option value="dessert" {% if item.category == 'dessert' %}selected{% endif %}>Dessert</option>
+    </select>
+</div>
+
+<div class="mb-3" id="food-type-section" 
+     style="display:{% if item.category == 'food' %}block{% else %}none{% endif %};">
+    <label class="form-label fw-semibold">Food Type</label>
+    <select name="food_type" class="form-select">
+        <option value="veg"     {% if item.food_type == 'veg'     %}selected{% endif %}>🟢 Vegetarian</option>
+        <option value="non_veg" {% if item.food_type == 'non_veg' %}selected{% endif %}>🔴 Non-Vegetarian</option>
+    </select>
+</div>
+
+<script>
+const catSelect = document.getElementById('category-select');
+const foodType  = document.getElementById('food-type-section');
+
+catSelect.addEventListener('change', function() {
+    foodType.style.display = this.value === 'food' ? 'block' : 'none';
+});
+</script>
         <div class="mb-4 form-check">
             <input type="checkbox" name="is_available" class="form-check-input"
                    id="available" {% if item.is_available %}checked{% endif %}>

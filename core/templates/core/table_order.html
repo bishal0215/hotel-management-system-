@@ -15,6 +15,11 @@
     <div class="col-12 col-lg-7">
         <div class="card p-3">
             <h5 class="fw-bold mb-3">Menu</h5>
+            {% if error %}
+        <div class="alert alert-danger py-2 small mb-3">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
             <form method="post">
                 {% csrf_token %}
                 {% regroup menu_items by category as category_list %}
@@ -26,7 +31,48 @@
                     {% for item in category.list %}
                     <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
                         <div>
-                            <div class="fw-semibold">{{ item.name }}</div>
+                            <div class="fw-semibold d-flex align-items-center gap-2">
+    {% if item.category == 'food' %}
+        {% if item.food_type == 'veg' %}
+            <span style="
+                display:inline-block;
+                width:16px; height:16px;
+                border:2px solid #16a34a;
+                border-radius:3px;
+                background:white;
+                position:relative;">
+                <span style="
+                    position:absolute;
+                    top:50%; left:50%;
+                    transform:translate(-50%,-50%);
+                    width:7px; height:7px;
+                    background:#16a34a;
+                    border-radius:50%;
+                    display:block;">
+                </span>
+            </span>
+        {% elif item.food_type == 'non_veg' %}
+            <span style="
+                display:inline-block;
+                width:16px; height:16px;
+                border:2px solid #dc2626;
+                border-radius:3px;
+                background:white;
+                position:relative;">
+                <span style="
+                    position:absolute;
+                    top:50%; left:50%;
+                    transform:translate(-50%,-50%);
+                    width:7px; height:7px;
+                    background:#dc2626;
+                    border-radius:50%;
+                    display:block;">
+                </span>
+            </span>
+        {% endif %}
+    {% endif %}
+    {{ item.name }}
+</div>
                             <div class="text-primary small">Rs.{{ item.price }}</div>
                         </div>
                         <div class="d-flex align-items-center gap-2">
@@ -122,4 +168,14 @@
         <p class="mt-2 small">No items yet. Add from the menu.</p>
     </div>
 {% endif %}
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+    const quantities = document.querySelectorAll('input[type="number"]');
+    const hasItems = Array.from(quantities).some(q => parseInt(q.value) > 0);
+    if (!hasItems) {
+        e.preventDefault();
+        alert('⚠️ Please select at least one item before adding to order!');
+    }
+});
+</script>
 {% endblock content %}

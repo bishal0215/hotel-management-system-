@@ -24,7 +24,22 @@
             <tbody>
                 {% for item in items %}
                 <tr>
-                    <td class="fw-semibold">{{ item.name }}</td>
+                    <td class="fw-semibold">
+    <div class="d-flex align-items-center gap-2">
+        {% if item.category == 'food' %}
+            {% if item.food_type == 'veg' %}
+                <span style="display:inline-block;width:16px;height:16px;border:2px solid #16a34a;border-radius:3px;background:white;position:relative;">
+                    <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:7px;height:7px;background:#16a34a;border-radius:50%;display:block;"></span>
+                </span>
+            {% elif item.food_type == 'non_veg' %}
+                <span style="display:inline-block;width:16px;height:16px;border:2px solid #dc2626;border-radius:3px;background:white;position:relative;">
+                    <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:7px;height:7px;background:#dc2626;border-radius:50%;display:block;"></span>
+                </span>
+            {% endif %}
+        {% endif %}
+        {{ item.name }}
+    </div>
+</td>
                     <td>
                         {% if item.category == 'food' %}
                             <span class=" badge bg-success"> food</span>
