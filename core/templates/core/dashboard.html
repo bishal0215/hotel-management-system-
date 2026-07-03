@@ -98,7 +98,7 @@
                 </div>
                 {% if order %}
                 <p class="text-muted small mb-2">
-                    Order #{{ order.id }} · {{ order.items.count }} item(s)
+                    Order #{{ order.daily_order_number }} · {{ order.items.count }} item(s)
                 </p>
                 <div class="bg-light rounded p-2 small mb-2">
                     {% for item in order.items.all|slice:":3" %}

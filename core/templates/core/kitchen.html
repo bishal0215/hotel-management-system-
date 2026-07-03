@@ -28,7 +28,7 @@
                     {% endif %}
                 </div>
                 <small class="text-muted mb-2 d-block">
-                    Order #{{ order.id }} · {{ order.created_at|time:"H:i" }}
+                    Order #{{ order.daily_order_number }} · {{ order.created_at|time:"H:i" }}
                     <span class="badge bg-secondary ms-1" id="k-elapsed-{{ order.id }}">
                     -- min
                     </span>

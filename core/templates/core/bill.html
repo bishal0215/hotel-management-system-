@@ -18,7 +18,7 @@
             <small class="opacity-75">Thank you for dining with us</small>
             <div class="d-flex justify-content-center gap-4 mt-3 small opacity-75">
                 <span>Table {{ order.table.number }}</span>
-                <span>Order #{{ order.id }}</span>
+                <span>Order #{{ order.daily_order_number }}</span>
                 <span>{{ order.created_at|date:"d M Y, H:i" }}</span>
             </div>
             <div class="mt-2">

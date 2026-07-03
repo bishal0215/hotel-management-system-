@@ -68,7 +68,10 @@
             <tbody>
                 {% for order in recent_orders %}
                 <tr>
-                    <td>#{{ order.id }}</td>
+                    <td>
+                        #{{ order.daily_order_number }}
+                        <small class="text-muted d-block">ID: {{ order.id }}</small>
+                    </td>
                     <td>Table {{ order.table.number }}</td>
                     <td>{{ order.items.count }}</td>
                     <td>Rs.{{ order.total_price }}</td>

@@ -55,18 +55,28 @@ class Order(models.Model):
         ('served', 'Served'),
         ('paid', 'Paid'),
     ]
-    table      = models.ForeignKey(Table, on_delete=models.CASCADE, related_name='orders')
-    status     = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    served_at  = models.DateTimeField(null=True, blank=True)
+    table              = models.ForeignKey(Table, on_delete=models.CASCADE, related_name='orders')
+    status             = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at         = models.DateTimeField(auto_now_add=True)
+    updated_at         = models.DateTimeField(auto_now=True)
+    served_at          = models.DateTimeField(null=True, blank=True)
+    daily_order_number = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:  # Only on creation
+            from django.utils import timezone
+            today = timezone.now().date()
+            last = Order.objects.filter(
+                created_at__date=today
+            ).order_by('-daily_order_number').first()
+            self.daily_order_number = (last.daily_order_number + 1) if last else 1
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Order #{self.id} - Table {self.table.number} [{self.status}]"
+        return f"Order #{self.daily_order_number} - Table {self.table.number} [{self.status}]"
 
     def total_price(self):
         return sum(item.subtotal() for item in self.items.all())
-
 class OrderItem(models.Model):
     order      = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     menu_item  = models.ForeignKey(MenuItem, on_delete=models.CASCADE)

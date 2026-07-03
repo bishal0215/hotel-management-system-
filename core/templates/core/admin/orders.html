@@ -36,7 +36,10 @@
 <tbody>
     {% for order in orders %}
     <tr>
-        <td>#{{ order.id }}</td>
+        <td>
+            <strong>#{{ order.daily_order_number }}</strong>
+            <small class="text-muted d-block">ID: {{ order.id }}</small>
+        </td>
         <td>Table {{ order.table.number }}</td>
         <td>
             {% for item in order.items.all %}
