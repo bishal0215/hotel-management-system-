@@ -32,7 +32,12 @@
 </div>
 
 <div class="mb-3" id="food-type-section" 
-     style="display:{% if item.category == 'food' %}block{% else %}none{% endif %};">
+     {% if item.category == 'food' %}
+         style="display:block;"
+     {% else %}
+         style="display:none;"
+     {% endif %}>
+     
     <label class="form-label fw-semibold">Food Type</label>
     <select name="food_type" class="form-select">
         <option value="veg"     {% if item.food_type == 'veg'     %}selected{% endif %}>🟢 Vegetarian</option>
